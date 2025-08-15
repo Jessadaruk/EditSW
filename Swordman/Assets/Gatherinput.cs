@@ -1,31 +1,34 @@
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GatherInput : MonoBehaviour
 {
-    private Controls myControl;
-    public float valueX;
+    private Controls controls;
 
-    public void Awake()
+    public Vector2 moveInput;
+    public bool jumpPressed;
+
+    private void Awake()
     {
-        myControl = new Controls();
+        controls = new Controls();
     }
+
     private void OnEnable()
     {
-        myControl.Player.Move.performed += StartMove;
-        myControl.Player.Move.canceled += StopMove;
-        myControl.Player.Enable();
+        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
+        controls.Player.Jump.performed += ctx => jumpPressed = true;
+
+        controls.Player.Enable();
     }
+
     private void OnDisable()
     {
-        myControl.Player.Move.performed -= StartMove;
-        myControl.Player.Move.canceled -= StopMove;
-        myControl.Player.Disable();
-        //myControl.Disable();
+        controls.Player.Disable();
     }
-    private void StartMove(InputAction.CallbackContext ctx) {
-        valueX = ctx.ReadValue<float>();
-    }
-    private void StopMove(InputAction.CallbackContext ctx) {
-        valueX = 0;
+
+    public void ResetJump()
+    {
+        jumpPressed = false;
     }
 }
